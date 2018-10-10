@@ -5,12 +5,13 @@ import logging
 import youtube_dl
 import pandas as pd
 import bot_token
+from ctypes.util import find_library
 
 
 logging.basicConfig(level=logging.INFO)
 
 if not discord.opus.is_loaded():
-    discord.opus.load_opus()
+    discord.opus.load_opus(find_library("opus"))
 
 client = discord.Client()
 
@@ -91,6 +92,17 @@ async def escape(message):
 	await client.server_voice_state(message.server.get_member(voice.user.id), mute = False, deafen = False)
 	await play_url(voice, 0.2, 'https://www.youtube.com/watch?v=TQHbVGFZ0v0')
 
+async def reset(message):
+	members = message.server.members
+	for member in members:
+		role_ids = []
+		for role in member.roles:
+			role_ids.append(role.id)
+		if ('236286122043506688' not in role_ids): #pussy_master role id
+			print("changed for", member.nick)
+			await client.change_nickname(member, None)
+	await client.delete_message(message)
+	
 async def cumify(message):
 	members = message.server.members
 	candidates = []
@@ -121,10 +133,14 @@ async def on_message(message):
 		
 	if message.content.startswith('!escape'):
 		await escape(message)
-	
+	''' #commenting out since command sucks
 	if message.content.startswith('!cumify'):
 		await cumify(message)
-		
+	'''
+	
+	if message.content.startswith('!resetnames'):
+		await reset(message)
+	
 	if message.content.startswith('!endparty'):
 		await endparty(message)
 					
